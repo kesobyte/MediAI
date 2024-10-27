@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { Upload } from "../Upload/Upload";
 
 export const NewPrompt = () => {
   const endRef = useRef(null);
@@ -15,16 +16,7 @@ export const NewPrompt = () => {
         action=""
         className="absolute flex items-center gap-[20px] w-[50%] bottom-0 bg-[#2c2937] rounded-[20px] p-[10px]"
       >
-        <label
-          htmlFor="file"
-          className="flex justify-center items-center p-[10px] border-none rounded-[50%] bg-[#605e68] cursor-pointer"
-        >
-          <img
-            src="/attachment.png"
-            alt="attachment"
-            className="w-[16px] h-[16px]"
-          />
-        </label>
+        <Upload />
         <input id="file" type="file" multiple={false} hidden />
         <input
           type="text"
