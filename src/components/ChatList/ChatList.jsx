@@ -27,7 +27,10 @@ export const ChatList = () => {
 
       <span className="font-semibold text-[10px] mb-[10px]">RECENT CHATS</span>
       <div className="flex flex-col overflow-y-auto">
-        <Link className="p-[10px] rounded-[10px] hover:bg-[#2c2937]" to="/">
+        <Link
+          className="p-[10px] rounded-[10px] hover:bg-[#2c2937]"
+          to="/dashboard/chats/123"
+        >
           My chat title
         </Link>
         <Link className="p-[10px] rounded-[10px] hover:bg-[#2c2937]" to="/">

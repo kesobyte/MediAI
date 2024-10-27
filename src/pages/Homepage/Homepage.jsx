@@ -31,12 +31,12 @@ export const Homepage = () => {
       <div className="flex-1 flex items-center justify-center h-full">
         <div className="relative flex items-center justify-center bg-[#140e2d] rounded-[50px] w-[80%] h-[50%]">
           <div className="absolute w-full h-full overflow-hidden top-0 left-0 rounded-[50px]">
-            <div className="w-[200%] h-[100%] bg-[url('/bg.png')] bg-[length:auto_100%] opacity-20 animate-slideBg"></div>
+            <div className="w-[200%] h-[100%] bg-[url('/bg.png')] bg-[length:auto_100%] opacity-20 animate-slideBg -z-10"></div>
           </div>
           <img
             src="/bot.png"
             alt="Bot"
-            className="w-full h-full object-contain z-10"
+            className="absolute w-full h-full object-contain p-[20px]"
           />
           <div className="hidden lg:flex absolute bottom-[-30px] right-[-50px] items-center gap-[10px] p-[20px] bg-[#2c2937] rounded-[10px] object-cover">
             <img
@@ -53,22 +53,22 @@ export const Homepage = () => {
             <TypeAnimation
               sequence={[
                 // Same substring at the start will only be typed out once, initially
-                "Human: We produce food for Mice",
+                "Kim: What is IPMI?",
                 2000,
                 () => {
                   setTypingStatus("bot");
                 },
-                "Bot: We produce food for Hamsters",
+                "Meddy: IPMI is International Private Medical Insurance",
                 2000,
                 () => {
                   setTypingStatus("human2");
                 },
-                "Human2: We produce food for Guinea Pigs",
+                "Pau: What is Deductible?",
                 2000,
                 () => {
                   setTypingStatus("bot");
                 },
-                "Bot: We produce food for Chinchillas",
+                "Meddy: The amount the insured must pay before insurance covers expenses",
                 2000,
                 () => {
                   setTypingStatus("human1");
