@@ -5,4 +5,17 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  theme: {
+    extend: {
+      keyframes: {
+        slideBg: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
+      animation: {
+        slideBg: "slideBg 8s ease-in-out infinite alternate",
+      },
+    },
+  },
 };
