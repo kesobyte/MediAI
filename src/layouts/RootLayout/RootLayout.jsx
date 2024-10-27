@@ -14,7 +14,7 @@ export const RootLayout = () => {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
       <div className="flex flex-col py-[16px] px-[64px] h-[100vh]">
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between h-[28px]">
           <Link to="/">
             <img
               src="/medi-ai-logo-white.png"
@@ -22,7 +22,7 @@ export const RootLayout = () => {
               className="w-[80px]"
             />
           </Link>
-          <div>
+          <div className="flex items-center">
             <SignedIn>
               <UserButton />
             </SignedIn>

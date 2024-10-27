@@ -13,7 +13,10 @@ export const DashboardLayout = () => {
     }
   }, [isLoaded, userId, navigate]);
 
-  if (!isLoaded) return "Loading...";
+  if (!isLoaded)
+    return (
+      <div className="flex h-full justify-center items-center">Loading...</div>
+    );
 
   return (
     <div className="flex gap-[50px] pt-[20px] h-full">

@@ -5,9 +5,24 @@ export const ChatList = () => {
   return (
     <div className="flex flex-col h-full">
       <span className="font-semibold text-[10px] mb-[10px]">DASHBOARD</span>
-      <Link to="/dashboard">Create a new chat</Link>
-      <Link to="/dashboard">Explore MediAI</Link>
-      <Link to="/dashboard">About</Link>
+      <Link
+        className="p-[10px] rounded-[10px] hover:bg-[#2c2937]"
+        to="/dashboard"
+      >
+        Create a new chat
+      </Link>
+      <Link
+        className="p-[10px] rounded-[10px] hover:bg-[#2c2937]"
+        to="/dashboard"
+      >
+        Explore MediAI
+      </Link>
+      <Link
+        className="p-[10px] rounded-[10px] hover:bg-[#2c2937]"
+        to="/dashboard"
+      >
+        About
+      </Link>
       <hr className="border-none h-[2px] bg-[#ddd] opacity-[0.1] rounden-[5px] my-[20px]" />
 
       <span className="font-semibold text-[10px] mb-[10px]">RECENT CHATS</span>
