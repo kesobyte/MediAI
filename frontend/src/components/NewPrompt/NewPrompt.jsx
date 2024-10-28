@@ -1,7 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Upload } from "../Upload/Upload";
+import { IKImage } from "imagekitio-react";
 
 export const NewPrompt = () => {
+  const [img, setImg] = useState({
+    isLoading: false,
+    error: "",
+    dbData: [],
+  });
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -11,12 +17,21 @@ export const NewPrompt = () => {
   return (
     <>
       {/* Add new chat */}
+      {img.isLoading && <div className="">Loading...</div>}
+      {img.dbData?.filePath && (
+        <IKImage
+          urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+          path={img.dbData?.filePath}
+          width={380}
+          transformation={[{ width: 380 }]}
+        />
+      )}
       <div className="pb-[100px]" ref={endRef}></div>
       <form
         action=""
         className="absolute flex items-center gap-[20px] w-[50%] bottom-0 bg-[#2c2937] rounded-[20px] p-[10px]"
       >
-        <Upload />
+        <Upload setImg={setImg} />
         <input id="file" type="file" multiple={false} hidden />
         <input
           type="text"
