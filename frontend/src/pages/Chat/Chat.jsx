@@ -50,9 +50,6 @@ export const Chat = () => {
             Test message from user
           </div>
           <div className="p-[20px]">Test message from AI</div>
-          <div className="p-[20px] bg-[#2c2937] rounded-[20px] max-w-[80%] self-end">
-            Test message from user
-          </div>
           <NewPrompt />
         </div>
       </div>
