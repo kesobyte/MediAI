@@ -12,8 +12,27 @@ export const NewPrompt = () => {
   const [img, setImg] = useState({
     isLoading: false,
     error: "",
-    dbData: [],
+    dbData: {},
+    aiData: {},
   });
+
+  // History
+  const chat = model.startChat({
+    history: [
+      {
+        role: "user",
+        parts: [{ text: "Hello" }],
+      },
+      {
+        role: "model",
+        parts: [{ text: "Great to meet you. What would you like to know?" }],
+      },
+    ],
+    generationConfig: {
+      maxOutputTokens: 1000,
+    },
+  });
+
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -24,11 +43,20 @@ export const NewPrompt = () => {
     // const prompt = "What is the version of genshin today?";
     setQuestion(text);
 
-    const result = await model.generateContent(text);
-    setAnswer(result.response.text());
-  };
+    const result = await chat.sendMessageStream(
+      Object.entries(img.aiData).length ? [img.aiData, text] : [text]
+    );
 
-  console.log(answer);
+    // Typing effect
+    let accumulatedText = "";
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      // console.log(chunkText);
+      accumulatedText += chunkText;
+      setAnswer(accumulatedText);
+    }
+    setImg({ isLoading: false, error: "", dbData: {}, aiData: {} });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,7 +126,7 @@ export const NewPrompt = () => {
       <div className="pb-[100px]" ref={endRef}></div>
       <form
         onSubmit={handleSubmit}
-        className="absolute flex items-center gap-[20px] w-[50%] bottom-0 bg-[#2c2937] rounded-[20px] p-[10px]"
+        className="absolute flex items-center gap-[20px] w-[60%] bottom-0 bg-[#2c2937] rounded-[20px] p-[10px]"
       >
         <Upload setImg={setImg} />
         <input id="file" type="file" multiple={false} hidden />

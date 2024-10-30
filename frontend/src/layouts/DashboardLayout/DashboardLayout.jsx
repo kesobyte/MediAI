@@ -23,7 +23,7 @@ export const DashboardLayout = () => {
       <div className="flex-1">
         <ChatList />
       </div>
-      <div className="flex-[4] bg-[#12101b]">
+      <div className="flex-[4] bg-[#12101b] p-[20px] rounded-lg">
         <Outlet />
       </div>
     </div>

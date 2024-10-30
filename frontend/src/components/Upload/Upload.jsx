@@ -3,6 +3,7 @@ import { IKContext, IKUpload } from "imagekitio-react";
 
 const urlEndpoint = import.meta.env.VITE_IMAGE_KIT_ENDPOINT;
 const publicKey = import.meta.env.VITE_IMAGE_KIT_PUBLIC_KEY;
+
 const authenticator = async () => {
   try {
     const response = await fetch("http://localhost:3000/api/upload");
@@ -39,8 +40,26 @@ export const Upload = ({ setImg }) => {
   };
 
   const onUploadStart = (evt) => {
-    console.log("Start", evt);
-    setImg((prev) => ({ ...prev, isLoading: true }));
+    const file = evt.target.files[0];
+    console.log("Selected file:", file); // Log file information
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      console.log("FileReader result:", reader.result); // Log the base64 data URL
+
+      setImg((prev) => ({
+        ...prev,
+        isLoading: true,
+        aiData: {
+          inlineData: {
+            data: reader.result.split(",")[1], // Log the base64 data without the prefix
+            mimeType: file.type,
+          },
+        },
+      }));
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
