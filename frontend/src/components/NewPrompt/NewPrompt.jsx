@@ -5,8 +5,9 @@ import model from "../../lib/gemini";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const NewPrompt = () => {
+export const NewPrompt = ({ data }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [img, setImg] = useState({
@@ -18,44 +19,79 @@ export const NewPrompt = () => {
 
   // History
   const chat = model.startChat({
-    history: [
-      {
-        role: "user",
-        parts: [{ text: "Hello" }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "Great to meet you. What would you like to know?" }],
-      },
-    ],
+    history:
+      data?.history?.map(({ role, parts }) => ({
+        role: role || "user", // default to 'user' if role is undefined
+        parts: [{ text: parts[0]?.text || "" }], // handle empty text or parts
+      })) || [], // ensure there's a fallback in case of undefined history
     generationConfig: {
-      maxOutputTokens: 1000,
+      // maxOutputTokens: 100, (optional)
     },
   });
 
   const endRef = useRef(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [question, answer, img.dbData]);
+  }, [data, question, answer, img.dbData]);
 
-  const add = async (text) => {
-    // const prompt = "What is the version of genshin today?";
-    setQuestion(text);
+  const queryClient = useQueryClient();
 
-    const result = await chat.sendMessageStream(
-      Object.entries(img.aiData).length ? [img.aiData, text] : [text]
-    );
+  const mutation = useMutation({
+    mutationFn: () => {
+      return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: question.length ? question : undefined,
+          answer,
+          img: img.dbData?.filePath || undefined,
+        }),
+      }).then((res) => res.json());
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient
+        .invalidateQueries({ queryKey: ["chat", data._id] })
+        .then(() => {
+          setQuestion("");
+          setAnswer("");
+          setImg({
+            isLoading: false,
+            error: "",
+            dbData: {},
+            aiData: {},
+          });
+        });
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
 
-    // Typing effect
-    let accumulatedText = "";
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      // console.log(chunkText);
-      accumulatedText += chunkText;
-      setAnswer(accumulatedText);
+  const add = async (text, isInitial) => {
+    if (!isInitial) setQuestion(text);
+
+    try {
+      const result = await chat.sendMessageStream(
+        Object.entries(img.aiData).length ? [img.aiData, text] : [text]
+      );
+      let accumulatedText = "";
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text();
+        // console.log(chunkText);
+        accumulatedText += chunkText;
+        setAnswer(accumulatedText);
+      }
+
+      mutation.mutate();
+    } catch (err) {
+      console.log(err);
     }
-    setImg({ isLoading: false, error: "", dbData: {}, aiData: {} });
   };
 
   const handleSubmit = async (e) => {
@@ -64,8 +100,21 @@ export const NewPrompt = () => {
     const text = e.target.text.value;
     if (!text) return;
 
-    add(text);
+    add(text, false);
+    formRef.current.reset();
   };
+
+  // IN PRODUCTION WE DON'T NEED IT
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (!hasRun.current) {
+      if (data?.history?.length === 1) {
+        add(data.history[0].parts[0].text, true);
+      }
+    }
+    hasRun.current = true;
+  }, []);
 
   return (
     <>
@@ -126,6 +175,7 @@ export const NewPrompt = () => {
       <div className="pb-[100px]" ref={endRef}></div>
       <form
         onSubmit={handleSubmit}
+        ref={formRef}
         className="absolute flex items-center gap-[20px] w-[60%] bottom-0 bg-[#2c2937] rounded-[20px] p-[10px]"
       >
         <Upload setImg={setImg} />

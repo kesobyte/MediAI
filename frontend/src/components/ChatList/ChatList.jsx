@@ -36,11 +36,13 @@ export const ChatList = () => {
 
       <span className="font-semibold text-[10px] mb-[10px]">RECENT CHATS</span>
       <div className="flex flex-col overflow-y-auto">
-        {isPending
+        {!data?.length
+          ? "No chat record" // Check if data is empty or undefined first
+          : isPending
           ? "Loading..."
           : error
           ? "Something went wrong"
-          : data?.map((chat) => (
+          : data.map((chat) => (
               <Link
                 to={`/dashboard/chats/${chat._id}`}
                 key={chat._id}
@@ -50,6 +52,7 @@ export const ChatList = () => {
               </Link>
             ))}
       </div>
+
       {/* <hr className="border-none h-[2px] bg-[#ddd] opacity-[0.1] rounden-[5px] my-[20px]" />
       <div className="mt-auto flex items-center gap-[10px] text-[12px]">
         <img src="/medi-ai-logo-white.png" alt="logo" className="w-[80px]" />

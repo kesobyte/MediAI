@@ -41,7 +41,6 @@ export const Upload = ({ setImg }) => {
 
   const onUploadStart = (evt) => {
     const file = evt.target.files[0];
-    console.log("Selected file:", file); // Log file information
 
     const reader = new FileReader();
     reader.onloadend = () => {
