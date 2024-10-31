@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { IKContext, IKUpload } from "imagekitio-react";
+import { IKContext, IKImage, IKUpload } from "imagekitio-react";
 
 const urlEndpoint = import.meta.env.VITE_IMAGE_KIT_ENDPOINT;
 const publicKey = import.meta.env.VITE_IMAGE_KIT_PUBLIC_KEY;
@@ -25,7 +25,6 @@ const authenticator = async () => {
 
 export const Upload = ({ setImg }) => {
   const ikUploadRef = useRef(null);
-
   const onError = (err) => {
     console.log("Error", err);
   };
@@ -44,20 +43,17 @@ export const Upload = ({ setImg }) => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      console.log("FileReader result:", reader.result); // Log the base64 data URL
-
       setImg((prev) => ({
         ...prev,
         isLoading: true,
         aiData: {
           inlineData: {
-            data: reader.result.split(",")[1], // Log the base64 data without the prefix
+            data: reader.result.split(",")[1],
             mimeType: file.type,
           },
         },
       }));
     };
-
     reader.readAsDataURL(file);
   };
 
@@ -69,7 +65,7 @@ export const Upload = ({ setImg }) => {
         authenticator={authenticator}
       >
         <IKUpload
-          fileName="test-upload.png"
+          fileName="mediai-upload.png"
           onError={onError}
           onSuccess={onSuccess}
           useUniqueFileName={true}

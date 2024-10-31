@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import url, { fileURLToPath } from "url";
 import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import Chat from "./models/chat.js";
@@ -8,6 +10,9 @@ import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
 const port = process.env.PORT || 3000;
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(
   cors({
@@ -45,7 +50,7 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
   const { text } = req.body;
 
   try {
-    // Create a new chat
+    // CREATE A NEW CHAT
     const newChat = new Chat({
       userId: userId,
       history: [{ role: "user", parts: [{ text }] }],
@@ -53,10 +58,10 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
 
     const savedChat = await newChat.save();
 
-    // Check if user chat exists
+    // CHECK IF THE USERCHATS EXISTS
     const userChats = await UserChats.find({ userId: userId });
 
-    // If doesn't exist, create aa new one and add the chat in the chats
+    // IF DOESN'T EXIST CREATE A NEW ONE AND ADD THE CHAT IN THE CHATS ARRAY
     if (!userChats.length) {
       const newUserChats = new UserChats({
         userId: userId,
@@ -70,7 +75,7 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
 
       await newUserChats.save();
     } else {
-      // If exists, push the chat to the existing array
+      // IF EXISTS, PUSH THE CHAT TO THE EXISTING ARRAY
       await UserChats.updateOne(
         { userId: userId },
         {
@@ -147,14 +152,19 @@ app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-//===============================================================================
-
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(401).send("Unauthenticated!");
 });
 
+// PRODUCTION
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+});
+
 app.listen(port, () => {
   connect();
-  console.log("Server running on port: 3000");
+  console.log("Server running on 3000");
 });

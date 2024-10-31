@@ -3,9 +3,9 @@ import { Upload } from "../Upload/Upload";
 import { IKImage } from "imagekitio-react";
 import model from "../../lib/gemini";
 import ReactMarkdown from "react-markdown";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const NewPrompt = ({ data }) => {
   const [question, setQuestion] = useState("");
@@ -25,7 +25,7 @@ export const NewPrompt = ({ data }) => {
         parts: [{ text: parts[0]?.text || "" }], // handle empty text or parts
       })) || [], // ensure there's a fallback in case of undefined history
     generationConfig: {
-      // maxOutputTokens: 100, (optional)
+      // maxOutputTokens: 10000,
     },
   });
 
@@ -83,8 +83,8 @@ export const NewPrompt = ({ data }) => {
       let accumulatedText = "";
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
-        // console.log(chunkText);
-        accumulatedText += chunkText;
+        console.log(chunkText);
+        accumulatedText = accumulatedText + chunkText;
         setAnswer(accumulatedText);
       }
 
@@ -124,7 +124,7 @@ export const NewPrompt = ({ data }) => {
         <IKImage
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
           path={img.dbData?.filePath}
-          width={380}
+          width="380"
           transformation={[{ width: 380 }]}
         />
       )}
@@ -134,7 +134,7 @@ export const NewPrompt = ({ data }) => {
         </div>
       )}
       {answer && (
-        <div className="p-[20px]">
+        <div className="">
           <ReactMarkdown
             components={{
               // Custom rendering for paragraphs

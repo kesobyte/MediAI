@@ -33,24 +33,30 @@ export const ChatList = () => {
         About
       </Link>
       <hr className="border-none h-[2px] bg-[#ddd] opacity-[0.1] rounden-[5px] my-[20px]" />
-
       <span className="font-semibold text-[10px] mb-[10px]">RECENT CHATS</span>
       <div className="flex flex-col overflow-y-auto">
-        {!data?.length
-          ? "No chat record" // Check if data is empty or undefined first
-          : isPending
-          ? "Loading..."
-          : error
-          ? "Something went wrong"
-          : data.map((chat) => (
-              <Link
-                to={`/dashboard/chats/${chat._id}`}
-                key={chat._id}
-                className="p-[10px] rounded-[10px] hover:bg-[#2c2937]"
-              >
-                {chat.title}
-              </Link>
-            ))}
+        {/* Early check if there are no chat records */}
+        {!data?.length && !isPending && !error && <div>No chat record</div>}
+
+        {/* Show loading only if data exists and is still being fetched */}
+        {data?.length > 0 && isPending && <div>Loading...</div>}
+
+        {/* Show error message if data exists but there's an error */}
+        {data?.length > 0 && error && <div>Something went wrong</div>}
+
+        {/* Render the data once it's available */}
+        {data?.length > 0 &&
+          !isPending &&
+          !error &&
+          data.map((chat) => (
+            <Link
+              to={`/dashboard/chats/${chat._id}`}
+              key={chat._id}
+              className="p-[10px] rounded-[10px] hover:bg-[#2c2937]"
+            >
+              {chat.title}
+            </Link>
+          ))}
       </div>
 
       {/* <hr className="border-none h-[2px] bg-[#ddd] opacity-[0.1] rounden-[5px] my-[20px]" />

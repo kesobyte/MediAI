@@ -16,6 +16,7 @@ export const Chat = () => {
         credentials: "include",
       }).then((res) => res.json()),
   });
+
   return (
     <div className="relative flex flex-col h-full items-center">
       <div className="flex flex-1 overflow-auto w-full justify-center">
