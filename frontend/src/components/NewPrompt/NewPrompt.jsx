@@ -4,10 +4,10 @@ import { IKImage } from "imagekitio-react";
 import model from "../../lib/gemini";
 import ReactMarkdown from "react-markdown";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import SyntaxHighlighter from "react-syntax-highlighter/dist/esm/prism-async-light";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-export const NewPrompt = ({ data }) => {
+export const NewPrompt = ({ data, addNewMessage }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [img, setImg] = useState({
@@ -17,13 +17,12 @@ export const NewPrompt = ({ data }) => {
     aiData: {},
   });
 
-  // History
   const chat = model.startChat({
     history:
       data?.history?.map(({ role, parts }) => ({
-        role: role || "user", // default to 'user' if role is undefined
-        parts: [{ text: parts[0]?.text || "" }], // handle empty text or parts
-      })) || [], // ensure there's a fallback in case of undefined history
+        role: role || "user",
+        parts: [{ text: parts[0]?.text || "" }],
+      })) || [],
     generationConfig: {
       // maxOutputTokens: 10000,
     },
@@ -54,19 +53,21 @@ export const NewPrompt = ({ data }) => {
       }).then((res) => res.json());
     },
     onSuccess: () => {
-      // Invalidate and refetch
-      queryClient
-        .invalidateQueries({ queryKey: ["chat", data._id] })
-        .then(() => {
-          setQuestion("");
-          setAnswer("");
-          setImg({
-            isLoading: false,
-            error: "",
-            dbData: {},
-            aiData: {},
-          });
-        });
+      // Add the new message to Chat's history as the final answer
+      addNewMessage({
+        role: "assistant",
+        parts: [{ text: answer }],
+        img: img.dbData?.filePath,
+      });
+
+      setQuestion("");
+      setAnswer("");
+      setImg({
+        isLoading: false,
+        error: "",
+        dbData: {},
+        aiData: {},
+      });
     },
     onError: (err) => {
       console.log(err);
@@ -80,14 +81,22 @@ export const NewPrompt = ({ data }) => {
       const result = await chat.sendMessageStream(
         Object.entries(img.aiData).length ? [img.aiData, text] : [text]
       );
+
       let accumulatedText = "";
+
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
-        console.log(chunkText);
-        accumulatedText = accumulatedText + chunkText;
+        accumulatedText += chunkText;
+
+        // Update answer progressively to create typing effect
         setAnswer(accumulatedText);
+
+        // Delay to enhance the typing effect (optional)
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
 
+      // Once streaming ends, update the answer with the full accumulated text
+      setAnswer(accumulatedText);
       mutation.mutate();
     } catch (err) {
       console.log(err);
@@ -104,7 +113,6 @@ export const NewPrompt = ({ data }) => {
     formRef.current.reset();
   };
 
-  // IN PRODUCTION WE DON'T NEED IT
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -114,17 +122,16 @@ export const NewPrompt = ({ data }) => {
       }
     }
     hasRun.current = true;
-  }, []);
+  }, [data]);
 
   return (
     <>
-      {/* Add new chat */}
       {img.isLoading && <div className="">Loading...</div>}
       {img.dbData?.filePath && (
         <IKImage
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
           path={img.dbData?.filePath}
-          width="380"
+          width={380}
           transformation={[{ width: 380 }]}
         />
       )}
@@ -134,21 +141,18 @@ export const NewPrompt = ({ data }) => {
         </div>
       )}
       {answer && (
-        <div className="">
+        <div className="p-[20px]">
           <ReactMarkdown
             components={{
-              // Custom rendering for paragraphs
               p: ({ children }) => (
                 <p className="my-5 text-justify">{children}</p>
               ),
-              // Custom rendering for list items
               li: ({ children }) => (
                 <li className="ml-6 list-disc mb-4">{children}</li>
               ),
               ol: ({ children }) => (
                 <ol className="ml-6 list-decimal mb-4">{children}</ol>
               ),
-              // Custom rendering for code blocks
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || "");
                 return !inline && match ? (

@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NewPrompt } from "../../components/NewPrompt/NewPrompt";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { IKImage } from "imagekitio-react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export const Chat = () => {
   const path = useLocation().pathname;
   const chatId = path.split("/").pop();
 
-  const { isPending, error, data } = useQuery({
+  const { isLoading, error, data } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: () =>
       fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
@@ -17,15 +19,29 @@ export const Chat = () => {
       }).then((res) => res.json()),
   });
 
+  const [history, setHistory] = useState([]);
+
+  // Initialize history when data is loaded
+  useEffect(() => {
+    if (data?.history) {
+      setHistory(data.history);
+    }
+  }, [data]);
+
+  // Callback function to add a new message to history
+  const addNewMessage = (newMessage) => {
+    setHistory((prevHistory) => [...prevHistory, newMessage]);
+  };
+
   return (
     <div className="relative flex flex-col h-full items-center">
       <div className="flex flex-1 overflow-auto w-full justify-center">
         <div className="flex flex-col w-[60%]">
-          {isPending
+          {isLoading
             ? "Loading..."
             : error
             ? "Something went wrong"
-            : data?.history?.map((message, index) => (
+            : history.map((message, index) => (
                 <div
                   key={index}
                   className={`px-[20px] rounded-[20px] max-w-[80%] ${
@@ -48,18 +64,15 @@ export const Chat = () => {
                   <div>
                     <ReactMarkdown
                       components={{
-                        // Custom rendering for paragraphs
                         p: ({ children }) => (
                           <p className="my-5 text-justify">{children}</p>
                         ),
-                        // Custom rendering for list items
                         li: ({ children }) => (
                           <li className="ml-6 list-disc mb-4">{children}</li>
                         ),
                         ol: ({ children }) => (
                           <ol className="ml-6 list-decimal mb-4">{children}</ol>
                         ),
-                        // Custom rendering for code blocks
                         code({ node, inline, className, children, ...props }) {
                           const match = /language-(\w+)/.exec(className || "");
                           return !inline && match ? (
@@ -84,7 +97,7 @@ export const Chat = () => {
                   </div>
                 </div>
               ))}
-          {data && <NewPrompt data={data} />}
+          {data && <NewPrompt data={data} addNewMessage={addNewMessage} />}
         </div>
       </div>
     </div>
