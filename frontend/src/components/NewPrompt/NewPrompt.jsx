@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SyntaxHighlighter from "react-syntax-highlighter/dist/esm/prism-async-light";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-export const NewPrompt = ({ data, addNewMessage }) => {
+export const NewPrompt = ({ data }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [img, setImg] = useState({
@@ -53,21 +53,18 @@ export const NewPrompt = ({ data, addNewMessage }) => {
       }).then((res) => res.json());
     },
     onSuccess: () => {
-      // Add the new message to Chat's history as the final answer
-      addNewMessage({
-        role: "assistant",
-        parts: [{ text: answer }],
-        img: img.dbData?.filePath,
-      });
-
-      setQuestion("");
-      setAnswer("");
-      setImg({
-        isLoading: false,
-        error: "",
-        dbData: {},
-        aiData: {},
-      });
+      queryClient
+        .invalidateQueries({ queryKey: ["chat", data._id] })
+        .then(() => {
+          setQuestion("");
+          setAnswer("");
+          setImg({
+            isLoading: false,
+            error: "",
+            dbData: {},
+            aiData: {},
+          });
+        });
     },
     onError: (err) => {
       console.log(err);
@@ -113,6 +110,7 @@ export const NewPrompt = ({ data, addNewMessage }) => {
     formRef.current.reset();
   };
 
+  // IN PRODUCTION WE DON'T NEED IT
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -122,7 +120,7 @@ export const NewPrompt = ({ data, addNewMessage }) => {
       }
     }
     hasRun.current = true;
-  }, [data]);
+  }, []);
 
   return (
     <>
@@ -141,7 +139,7 @@ export const NewPrompt = ({ data, addNewMessage }) => {
         </div>
       )}
       {answer && (
-        <div className="p-[20px]">
+        <div className="p-[20px] max-w-[80%]">
           <ReactMarkdown
             components={{
               p: ({ children }) => (

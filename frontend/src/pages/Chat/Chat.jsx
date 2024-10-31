@@ -11,7 +11,7 @@ export const Chat = () => {
   const path = useLocation().pathname;
   const chatId = path.split("/").pop();
 
-  const { isLoading, error, data } = useQuery({
+  const { isPending, error, data } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: () =>
       fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
@@ -19,29 +19,29 @@ export const Chat = () => {
       }).then((res) => res.json()),
   });
 
-  const [history, setHistory] = useState([]);
+  // const [history, setHistory] = useState([]);
 
-  // Initialize history when data is loaded
-  useEffect(() => {
-    if (data?.history) {
-      setHistory(data.history);
-    }
-  }, [data]);
+  // // Initialize history when data is loaded
+  // useEffect(() => {
+  //   if (data?.history) {
+  //     setHistory(data.history);
+  //   }
+  // }, [data]);
 
-  // Callback function to add a new message to history
-  const addNewMessage = (newMessage) => {
-    setHistory((prevHistory) => [...prevHistory, newMessage]);
-  };
+  // // Callback function to add a new message to history
+  // const addNewMessage = (newMessage) => {
+  //   setHistory((prevHistory) => [...prevHistory, newMessage]);
+  // };
 
   return (
     <div className="relative flex flex-col h-full items-center">
       <div className="flex flex-1 overflow-auto w-full justify-center">
         <div className="flex flex-col w-[60%]">
-          {isLoading
+          {isPending
             ? "Loading..."
             : error
             ? "Something went wrong"
-            : history.map((message, index) => (
+            : data?.history?.map((message, index) => (
                 <div
                   key={index}
                   className={`px-[20px] rounded-[20px] max-w-[80%] ${
@@ -94,10 +94,11 @@ export const Chat = () => {
                     >
                       {message.parts[0].text}
                     </ReactMarkdown>
+                    {/* <ReactMarkdown>{message.parts[0].text}</ReactMarkdown> */}
                   </div>
                 </div>
               ))}
-          {data && <NewPrompt data={data} addNewMessage={addNewMessage} />}
+          {data && <NewPrompt data={data} />}
         </div>
       </div>
     </div>
