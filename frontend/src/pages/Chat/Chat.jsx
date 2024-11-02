@@ -19,20 +19,6 @@ export const Chat = () => {
       }).then((res) => res.json()),
   });
 
-  // const [history, setHistory] = useState([]);
-
-  // // Initialize history when data is loaded
-  // useEffect(() => {
-  //   if (data?.history) {
-  //     setHistory(data.history);
-  //   }
-  // }, [data]);
-
-  // // Callback function to add a new message to history
-  // const addNewMessage = (newMessage) => {
-  //   setHistory((prevHistory) => [...prevHistory, newMessage]);
-  // };
-
   return (
     <div className="relative flex flex-col h-full items-center">
       <div className="flex flex-1 overflow-auto w-full justify-center">
@@ -50,17 +36,19 @@ export const Chat = () => {
                       : "self-start"
                   }`}
                 >
-                  {message.img && (
-                    <IKImage
-                      urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
-                      path={message.img}
-                      height="300"
-                      width="400"
-                      transformation={[{ height: 300, width: 400 }]}
-                      loading="lazy"
-                      lqip={{ active: true, quality: 20 }}
-                    />
-                  )}
+                  {
+                    message.img && message.img.trim() !== "" ? (
+                      <IKImage
+                        urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+                        path={message.img}
+                        height="300"
+                        width="400"
+                        transformation={[{ height: 300, width: 400 }]}
+                        loading="lazy"
+                        lqip={{ active: true, quality: 20 }}
+                      />
+                    ) : null /* Do not render IKImage if path is invalid */
+                  }
                   <div>
                     <ReactMarkdown
                       components={{

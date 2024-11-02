@@ -102,6 +102,11 @@ app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
   try {
     const userChats = await UserChats.find({ userId });
 
+    // Check if userChats[0] is defined
+    if (!userChats[0]) {
+      return res.status(200).send([]); // Send an empty array if no chats are found
+    }
+
     res.status(200).send(userChats[0].chats);
   } catch (err) {
     console.log(err);
@@ -124,8 +129,9 @@ app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
 
 app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
-
   const { question, answer, img } = req.body;
+
+  console.log("Received image data:", img); // Log to check if img is valid
 
   const newItems = [
     ...(question
