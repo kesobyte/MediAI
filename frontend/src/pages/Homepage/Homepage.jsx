@@ -16,9 +16,8 @@ export const Homepage = () => {
           Supercharge your creativity and productivity
         </h2>
         <h3 className="max-w-[100%] lg:max-w-[70%]">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-          consequuntur aspernatur tenetur? Libero aut obcaecati cumque excepturi
-          numquam.
+          MediAI, a dedicated AI assistant for Medishure employees, streamlines
+          tasks, improves writing, analyzes photos, and boosts productivity.
         </h3>
         <Link to="/dashboard">
           <button className="py-[15px] px-[25px] bg-[#217bfe] text-white rounded-[18px] text-[14px] hover:bg-white hover:text-[#217bfe]">
