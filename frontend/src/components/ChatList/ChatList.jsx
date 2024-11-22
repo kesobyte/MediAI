@@ -122,7 +122,7 @@ export const ChatList = ({ focusedChatId }) => {
                                 : "opacity-0"
                             }`}
                 >
-                  <FaTrash /> {/* Trash icon */}
+                  <FaTrash />
                 </button>
               </div>
             )
