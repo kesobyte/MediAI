@@ -19,6 +19,11 @@ export const Homepage = () => {
           MediAI, a dedicated AI assistant for Medishure employees, streamlines
           tasks, improves writing, analyzes photos, and boosts productivity.
         </h3>
+        <p className="text-red-500 max-w-[100%] lg:max-w-[70%]">
+          ** Disclaimer: This app is currently in the development phase, so you
+          may encounter some issues or bugs while using it. Thank you for your
+          understanding **
+        </p>
         <Link to="/dashboard">
           <button className="py-[15px] px-[25px] bg-[#217bfe] text-white rounded-[18px] text-[14px] hover:bg-white hover:text-[#217bfe]">
             Get Started

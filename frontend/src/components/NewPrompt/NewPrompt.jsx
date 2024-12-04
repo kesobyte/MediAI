@@ -17,12 +17,22 @@ export const NewPrompt = ({ data }) => {
     aiData: {},
   });
 
+  // const chat = model.startChat({
+  //   history:
+  //     data?.history?.map(({ role, parts }) => ({
+  //       role: role || "user",
+  //       parts: [{ text: parts[0]?.text || "" }],
+  //     })) || [],
+  //   generationConfig: {
+  //     // maxOutputTokens: 10000,
+  //   },
+  // });
+
   const chat = model.startChat({
-    history:
-      data?.history?.map(({ role, parts }) => ({
-        role: role || "user",
-        parts: [{ text: parts[0]?.text || "" }],
-      })) || [],
+    history: data?.history?.map(({ role, parts }) => ({
+      role,
+      parts: [{ text: parts[0].text }],
+    })),
     generationConfig: {
       // maxOutputTokens: 10000,
     },

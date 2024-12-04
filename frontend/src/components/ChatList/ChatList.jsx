@@ -132,7 +132,7 @@ export const ChatList = ({ focusedChatId }) => {
       <hr className="border-none h-[2px] bg-[#ddd] opacity-[0.1] my-[20px]" />
       <div className="mt-auto flex items-center gap-[10px] text-[12px]">
         <span className="font-semibold">Medishure AI •</span>
-        <span className="text-[#888]">Version 0.1.0</span>
+        <span className="text-[#888]">Version 0.1.0 [Alpha]</span>
       </div>
     </div>
   );
